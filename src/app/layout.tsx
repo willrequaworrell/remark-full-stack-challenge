@@ -29,9 +29,7 @@ export default function RootLayout({
       >
         {children}
       </body>
-      <footer>
-        <p>Powered by <a target="_blank" href="https://getsongbpm.com/">getsongbpm.com</a></p>
-      </footer>
+      <p>Powered by <a target="_blank" href="https://getsongbpm.com/">getsongbpm.com</a></p>
     </html>
   );
 }
