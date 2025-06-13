@@ -2,10 +2,12 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useSpotifyLibrary } from "@/hooks/useSpotify";
 
 export default function ChatInterface() {
   const { data: session } = useSession();
   const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const { library, loading, error } = useSpotifyLibrary();
 
   if (!session) {
     return (
@@ -22,9 +24,16 @@ export default function ChatInterface() {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+    <div className="flex flex-col w-full max-w-4xl py-24 mx-auto">
       <div className="mb-4 flex justify-between items-center">
-        <p>Signed in as {session.user?.email}</p>
+        <div>
+          <p>Signed in as {session.user?.email}</p>
+          {library && (
+            <p className="text-sm text-gray-600">
+              {library.total} liked songs loaded
+            </p>
+          )}
+        </div>
         <button
           onClick={() => signOut()}
           className="text-sm text-gray-500 hover:text-gray-700"
@@ -32,25 +41,51 @@ export default function ChatInterface() {
           Sign out
         </button>
       </div>
-      {messages.map((message) => (
-        <div key={message.id} className="whitespace-pre-wrap">
-          {message.role === "user" ? "User: " : "AI: "}
-          {message.parts.map((part, i) => {
-            switch (part.type) {
-              case "text":
-                return <div key={`${message.id}-${i}`}>{part.text}</div>;
-            }
-          })}
-        </div>
-      ))}
-      <form onSubmit={handleSubmit}>
-        <input
-          className="fixed dark:bg-zinc-900 bottom-0 w-full max-w-md p-2 mb-8 border border-zinc-300 dark:border-zinc-800 rounded shadow-xl"
-          value={input}
-          placeholder="Ask about music recommendations..."
-          onChange={handleInputChange}
-        />
-      </form>
+
+      {/* Library Preview */}
+      <div className="mb-6 p-4 border rounded-lg">
+        <h3 className="font-bold mb-2">Your Spotify Library (Test)</h3>
+        {loading && <p>Loading your liked songs...</p>}
+        {error && <p className="text-red-500">Error: {error}</p>}
+        {library && (
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {library.tracks.slice(0, 5).map((track) => (
+              <div key={track.id} className="text-sm">
+                <strong>{track.name}</strong> by {track.artist}
+              </div>
+            ))}
+            {library.tracks.length > 5 && (
+              <p className="text-xs text-gray-500">
+                ...and {library.tracks.length - 5} more tracks
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Chat Interface */}
+      <div className="flex flex-col max-w-md mx-auto stretch">
+        {messages.map((message) => (
+          <div key={message.id} className="whitespace-pre-wrap mb-4">
+            {message.role === "user" ? "User: " : "AI: "}
+            {message.parts.map((part, i) => {
+              switch (part.type) {
+                case "text":
+                  return <div key={`${message.id}-${i}`}>{part.text}</div>;
+              }
+            })}
+          </div>
+        ))}
+
+        <form onSubmit={handleSubmit}>
+          <input
+            className="fixed dark:bg-zinc-900 bottom-0 w-full max-w-md p-2 mb-8 border border-zinc-300 dark:border-zinc-800 rounded shadow-xl"
+            value={input}
+            placeholder="Ask about your music library..."
+            onChange={handleInputChange}
+          />
+        </form>
+      </div>
     </div>
   );
 }
