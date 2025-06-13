@@ -14,7 +14,7 @@ export const RootProvider = React.memo(
     return (
       <SessionProvider
         session={session}
-        refetchInterval={5 * 60} // Refresh session every 5 mins
+        refetchInterval={5 * 60}
         refetchOnWindowFocus={false}
       >
         {children}
@@ -22,3 +22,5 @@ export const RootProvider = React.memo(
     );
   }
 );
+
+RootProvider.displayName = 'RootProvider';  // <-- Add this line
