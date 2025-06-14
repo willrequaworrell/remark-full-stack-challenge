@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useSpotifyLibrary } from "@/hooks/useSpotify";
+import { useSpotifyLibrary } from "../hooks/useSpotify";
 
 export default function ChatInterface() {
   const { data: session } = useSession();
@@ -66,14 +66,30 @@ export default function ChatInterface() {
       {/* Chat Interface */}
       <div className="flex flex-col max-w-md mx-auto stretch">
         {messages.map((message) => (
+          
           <div key={message.id} className="whitespace-pre-wrap mb-4">
             {message.role === "user" ? "User: " : "AI: "}
             {message.parts.map((part, i) => {
-              switch (part.type) {
-                case "text":
-                  return <div key={`${message.id}-${i}`}>{part.text}</div>;
-              }
-            })}
+  switch (part.type) {
+    case "text":
+      return <div key={i}>{part.text}</div>;
+    case "tool-invocation":
+      return (
+        <div key={i} className="text-gray-500">
+          Calling {part.toolInvocation.toolName}...
+        </div>
+      );
+    case "step-start":
+      return (
+        <div key={i} className="text-gray-500">
+           {part.type}...
+        </div>
+      );
+    default:
+      return null;
+  }
+})}
+
           </div>
         ))}
 
