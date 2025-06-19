@@ -1,3 +1,5 @@
+// src/app/api/auth/[...nextauth]/route.ts
+
 import NextAuth from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import type { JWT } from "next-auth/jwt";
@@ -10,7 +12,10 @@ const scopes = [
   "playlist-modify-public",
   "user-library-read",
   "user-read-playback-state",
-  "user-modify-playback-state"
+  "user-modify-playback-state",
+  "streaming",
+  "user-read-email",
+  "user-read-private",
 ].join(",");
 
 export const authOptions = {

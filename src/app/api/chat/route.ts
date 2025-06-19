@@ -1,107 +1,103 @@
 import { openai } from '@ai-sdk/openai';
 import { streamText, tool } from 'ai';
-import { z } from 'zod';
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { getPlaylistTracksFromSpotify } from '@/lib/tools/spotify';
+import { getTrackDetails } from '@/lib/tools/getsongbpm';
+import { getRecommendations } from '@/lib/tools/getRecommendations';
+
+
+interface CompatibleTrack {
+  name: string;
+  artist: string;
+  bpm: number;
+  key: string;
+  spotify_id: string;
+}
+
+interface PlaylistTrack {
+  id: string;
+  name: string;
+  artist: string;
+}
+
+interface ConsolidatedTrack {
+  trackId: string;
+  title: string;
+  artist: string;
+  bpm: number | null;
+  key: string | null;
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+}
+
+
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
-
+  const { messages, playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData } = await req.json();
+  
+  
+  
+  const createSystemPrompt = (
+    playlistId: string,
+    currentTrackId: string,
+    playlistTrackData: ConsolidatedTrack[]
+  ) => {
+    const trackList = playlistTrackData
+      .map((t, i) => {
+        const bpm   = t.bpm  !== null ? t.bpm  : 'Unknown';
+        const key   = t.key  !== null ? t.key  : 'Unknown';
+        const conf  = t.confidence;
+        return `${i + 1}. "${t.title}" by ${t.artist} (ID: ${t.trackId}) — BPM: ${bpm}, Key: ${key}, Confidence: ${conf}`;
+      })
+      .join('\n');
+  
+    return `
+  You are a professional DJ assistant. Use the following playlist track data to recommend the perfect next track.
+  
+  PLAYLIST ID: ${playlistId}
+  
+  CURRENT TRACK ID: ${currentTrackId} <--- when asked about the current playing track or current track, ALWAYS use this id to index PLAYLIST TRACK DATA for the title and artist  
+  
+  PLAYLIST TRACK DATA:
+  ${trackList}
+  
+  HARMONIC MIXING GUIDELINES:
+  1. Prioritize tracks within ±5 BPM of the current track for the smoothest tempo transitions.  
+  2. Among BPM-similar tracks, choose the one with the closest Camelot key match to ensure harmonic compatibility.
+      2a. Camelot key match can be determined by:
+        -  adjacent Camelot numbers (±1) sharing the same letter (e.g., 8A↔9A) or as close as possible by number while maintaining the letter. 
+        -  If no adjacent match, same number different letter is also good
+  
+  MUSICAL KEYS → CAMELOT KEYS MAP:
+  C Major → 8B; A minor → 8A; G Major → 9B; E minor → 9A; D Major → 10B; B minor → 10A;
+  A Major → 11B; F♯ minor → 11A; E Major → 12B; C♯ minor → 12A; B Major → 1B; G♯ minor → 1A
+  
+  RESPONSIBILITIES:
+  - Recommend **only** from the above playlist based on these guidelines.  
+  - Provide concise, actionable advice with brief reasoning under three sentences.  
+  
+  TOOL GUIDELINES:
+  - Use **getRecommendations** for transition suggestions leveraging this metadata.  
+  - Use **getTrackDetails** for on-demand BPM/key lookups if needed.
+  `;
+  };
+  
+  
+  
   try {
+    const prompt = createSystemPrompt(playlistId, currentTrackId, aiConsolidatedTrackData)
+    console.log(prompt)
     const result = streamText({
       model: openai('gpt-4o'),
       maxSteps: 10, // Conservative buffer for complex interactions
-      temperature: 0.7, // Encourage creativity while staying focused
-      system: `You're an enthusiastic music assistant. When asked about liked songs:
-1. REQUIRED: Use getUserLibrary tool
-2. ALWAYS include:
-   - Total track count
-   - 3-5 diverse examples with artists
-   - Personalized insight about their taste
-3. NEVER mention technical details (tools, APIs, etc)
-4. Keep responses under 3 sentences`,
+      temperature: 0.5, 
+      system: prompt,
       
       messages,
       
       tools: {
-        getUserLibrary: tool({
-          description: 'Get user\'s Spotify liked songs. Returns {total: number, tracks: {name: string, artist: string}[]}',
-          parameters: z.object({}),
-          execute: async () => {
-            const session = await getServerSession(authOptions);
-            if (!session?.accessToken) throw new Error('Not signed in to Spotify');
-            
-            const response = await fetch("https://api.spotify.com/v1/me/tracks?limit=50", {
-              headers: { Authorization: `Bearer ${session.accessToken}` },
-            });
-
-            if (!response.ok) {
-              throw new Error(`Spotify error: ${response.status} - ${await response.text()}`);
-            }
-
-            const data = await response.json();
-            return {
-              total: data.total,
-              tracks: data.items.map((item: any) => ({
-                name: item.track.name,
-                artist: item.track.artists[0]?.name,
-              }))
-            };
-          },
-        }),
-        getTrackDetails: tool({
-          description: 'Fetch BPM, key, and metadata for a track from GetSongBPM',
-          parameters: z.object({
-            songTitle: z.string(),
-            artistName: z.string().optional()
-          }),
-          execute: async ({ songTitle, artistName }) => {
-            try {
-              const apiKey = process.env.GETSONGBPM_API_KEY;
-              if (!apiKey) throw new Error('API key missing');
-      
-              const lookup = artistName
-              ? `song:${songTitle.replace(/ /g, '+')} artist:${artistName.replace(/ /g, '+')}`
-              : songTitle.replace(/ /g, '+');
-
-              const searchUrl = `https://api.getsongbpm.com/search/?api_key=${apiKey}&type=${artistName ? 'both' : 'song'}&lookup=${lookup}`.trim();
-              console.log(searchUrl.replace(/ /g, ''))
-              // 2. Get song ID
-              const searchResponse = await fetch(searchUrl);
-              if (!searchResponse.ok) throw new Error(`Search failed: ${searchResponse.status}`);
-              
-              const searchData = await searchResponse.json();
-              console.log(searchData)
-              const firstSong = searchData.search?.[0];
-              if (!firstSong?.id) {
-                throw new Error('Song not found');
-              }
-      
-              // 3. Get detailed track data
-              const songUrl = `https://api.getsongbpm.com/song/?api_key=${apiKey}&id=${firstSong.id}`;
-              const songResponse = await fetch(songUrl);
-              if (!songResponse.ok) throw new Error(`Details failed: ${songResponse.status}`);
-      
-              const songData = await songResponse.json();
-              
-              return {
-                title: songData.song.title,
-                artist: songData.song.artist.name,
-                bpm: songData.song.tempo,
-                key: songData.song.key_of,
-                danceability: songData.song.danceability,
-                energy: songData.song.energy,
-                spotifyId: songData.song.spotify_id
-              };
-      
-            } catch (error) {
-              return { 
-                error: error instanceof Error ? error.message : 'Failed to fetch track details',
-                suggestion: 'Try being more specific with both song and artist names'
-              };
-            }
-          }
-        })
+        getPlaylistTracksFromSpotify,
+        getTrackDetails,
+        getRecommendations,
       },
     });
 
@@ -114,3 +110,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+
