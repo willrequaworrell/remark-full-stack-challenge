@@ -1,5 +1,5 @@
 // app/api/spotify/playlists/[id]/tracks/route.ts
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth/authOptions";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 

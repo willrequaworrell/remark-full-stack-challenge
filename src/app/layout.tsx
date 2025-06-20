@@ -4,10 +4,10 @@ import { getServerSession } from "next-auth";
 import { Suspense } from "react";
 import "./globals.css";
 import { RootProvider } from "./providers/root-provider";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { AppErrorBoundary } from "./providers/error-boundary";
 import { TbLoader3 } from "react-icons/tb";
 import { Footer } from "./components/Footer";
+import { authOptions } from "@/lib/auth/authOptions";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const session = await getServerSession(authOptions); // ✅ Fixed authOptions
+  const session = await getServerSession(authOptions); 
 
   return (
     <html lang="en" suppressHydrationWarning>

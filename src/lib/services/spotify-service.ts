@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { SpotifyPlaylistTrack } from "@/app/types/track";
+import { authOptions } from "../auth/authOptions";
 
 export async function getSpotifyAccessToken() {
   const session = await getServerSession(authOptions);
