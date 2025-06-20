@@ -152,12 +152,6 @@ export default function Page() {
             <div className="flex flex-col lg:w-[38.2%] w-full p-4 md:p-6 h-full border-l-2 border-black">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg font-black uppercase">DJ AI</h2>
-                <button
-                  onClick={() => signOut()}
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  Sign out
-                </button>
               </div>
               <LoadingSpinner
                 size={8}

@@ -7,6 +7,7 @@ import { RootProvider } from "./providers/root-provider";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { AppErrorBoundary } from "./providers/error-boundary";
 import { TbLoader3 } from "react-icons/tb";
+import { Footer } from "./components/Footer";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -29,21 +30,16 @@ export default async function RootLayout({
           <Suspense fallback={<GlobalLoading />}>
             <RootProvider session={session}>
               {children}
+              <Footer/>
             </RootProvider>
           </Suspense>
         </AppErrorBoundary>
-        <StaticFooter />
+        {/* <StaticFooter /> */}
       </body>
     </html>
   );
 }
 
-
-const StaticFooter = () => (
-  <footer className="p-4 text-xs text-center text-gray-500">
-    <p>Powered by <a target="_blank" href="https://getsongbpm.com/">getsongbpm.com</a></p>
-  </footer>
-);
 
 const GlobalLoading = () => (
   <div className="flex items-center justify-center min-h-screen">

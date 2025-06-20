@@ -2,6 +2,7 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) => void }) {
   const { data: session, status } = useSession();
@@ -23,7 +24,6 @@ export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) =>
         });
 
         if (!response.ok) {
-          // Handle specific Spotify API error codes
           if (response.status === 401) {
             throw new Error("Your Spotify session has expired. Please sign out and sign back in.");
           } else if (response.status === 403) {
@@ -77,7 +77,7 @@ export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) =>
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        Loading your playlists...
+        <LoadingSpinner size={16} />
       </div>
     );
   }
@@ -85,7 +85,7 @@ export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) =>
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="max-w-md p-6 text-center border border-red-200 rounded-lg bg-red-50">
+        <div className="max-w-md p-6 text-center bg-white border-2 border-black rounded-xl">
           <h2 className="mb-2 text-lg font-semibold text-red-800">Unable to Load Playlists</h2>
           <p className="mb-4 text-red-600">{error}</p>
           <div className="space-x-2">
@@ -110,33 +110,31 @@ export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) =>
   if (playlists.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        No playlists found.
+        <div className="max-w-md p-6 text-center bg-white border-2 border-black rounded-xl">
+          No playlists found.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-      <div className="flex items-center justify-between w-full max-w-md mb-4">
-        <h1 className="text-2xl font-bold">Select a Playlist</h1>
-        <button
-          onClick={() => signOut()}
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
-          Sign out
-        </button>
-      </div>
-      <div className="w-full max-w-md overflow-y-auto max-h-96">
-        {playlists.map((playlist) => (
-          <button
-            key={playlist.id}
-            onClick={() => onSelect(playlist.id)}
-            className="w-full p-4 text-left transition-colors border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <strong>{playlist.name}</strong>
-            <p className="text-sm text-gray-500">{playlist.tracks.total} tracks</p>
-          </button>
-        ))}
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="w-full max-w-xl overflow-hidden bg-white border-2 border-black rounded-xl">
+        <div className="flex items-center justify-between p-4 border-b-2 border-black">
+          <h1 className="text-2xl font-bold">Select a Playlist</h1>
+        </div>
+        <div className="p-4 space-y-2 overflow-y-auto max-h-96">
+          {playlists.map((playlist) => (
+            <button
+              key={playlist.id}
+              onClick={() => onSelect(playlist.id)}
+              className="w-full p-3 text-left transition-colors border-2 border-black rounded-lg hover:bg-gray-100"
+            >
+              <strong>{playlist.name}</strong>
+              <p className="text-sm text-gray-500">{playlist.tracks.total} tracks</p>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
