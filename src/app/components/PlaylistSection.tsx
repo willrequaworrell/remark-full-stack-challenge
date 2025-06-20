@@ -30,6 +30,7 @@ const PlaylistSection = ({playlistTracks, onTrackClick, currentTrackId}: Playlis
 
           return (
             <PlaylistTrack 
+              key={track.id}
               track={track} 
               index={index}
               currentTrackId={currentTrackId}

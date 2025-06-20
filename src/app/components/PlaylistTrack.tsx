@@ -2,6 +2,7 @@ import { CgLoadbarSound } from "react-icons/cg"
 import { PlaylistTrackCardType } from "../types/track"
 
 interface PlaylistTrackProps {
+    key: string
     track: {
         id: string
         name: string

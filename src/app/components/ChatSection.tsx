@@ -3,7 +3,6 @@
 import { useChat } from "@ai-sdk/react";
 import { useSession, signIn } from "next-auth/react";
 import { useRef, useEffect, FormEvent, useMemo } from "react";
-import { PiDotsThreeOutlineDuotone } from "react-icons/pi";
 import { ConsolidatedTrack, SpotifyPlaylistTrack } from "../types/track";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
@@ -68,7 +67,7 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
           // While loading and this is the new assistant stub, show placeholder bubble
           if (isLoading && message.role === "assistant" && !hasText) {
             return (
-              <ChatMessageLoading idx={idx}/>
+              <ChatMessageLoading key={idx}/>
             );
           }
 
