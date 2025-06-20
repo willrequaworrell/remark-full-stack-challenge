@@ -17,7 +17,7 @@ const PlaylistTrack = ({track, index, currentTrackId, onClickPlay}: PlaylistTrac
     return (
         <div
             key={track.id}
-            className={`flex items-center w-full border-2 border-black rounded-lg px-3 md:px-4 py-2 md:py-3 bg-white text-black hover:bg-gray-100 transition }`}
+            className={`group flex items-center w-full border-2 border-black rounded-lg px-3 md:px-4 py-2 md:py-3 bg-white text-black hover:bg-gray-100 transition }`}
         >
             {/* Album Art */}
             <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden bg-gray-100 border-2 border-black rounded md:w-12 md:h-12 md:mr-4">
@@ -25,7 +25,7 @@ const PlaylistTrack = ({track, index, currentTrackId, onClickPlay}: PlaylistTrac
                     <img
                         src={track.albumArt}
                         alt={track.name}
-                        className="object-cover w-full h-full rounded"
+                        className="object-cover w-full h-full"
                     />
                 ) : (
                     <span className="text-xs font-black text-black">IMG</span>
@@ -45,7 +45,7 @@ const PlaylistTrack = ({track, index, currentTrackId, onClickPlay}: PlaylistTrac
                 
                 <button
                     onClick={() => onClickPlay?.(track, index)}
-                    className="flex items-center justify-center w-8 h-8 ml-2 transition border-2 border-black rounded-full hover:bg-black hover:text-white"
+                    className="items-center justify-center hidden w-8 h-8 ml-2 transition-all border-2 border-black rounded-full group-hover:flex hover:bg-black hover:text-white"
                 >
                     
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
