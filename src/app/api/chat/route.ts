@@ -21,7 +21,7 @@ interface ConsolidatedTrack {
 export async function POST(req: Request) {
   const { messages, playlistId, currentTrackId, aiConsolidatedTrackData } = await req.json();
   
-  
+  console.log(aiConsolidatedTrackData)
   
   const createSystemPrompt = (
     playlistId: string,
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
   
   try {
     const prompt = createSystemPrompt(playlistId, currentTrackId, aiConsolidatedTrackData)
-    console.log(prompt)
+    // console.log(prompt)
     const result = streamText({
       model: openai('gpt-4o'),
       maxSteps: 10, // Conservative buffer for complex interactions
