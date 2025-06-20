@@ -53,8 +53,9 @@ export async function POST(req: Request) {
 
 
   HARMONIC MIXING GUIDELINES:
+  0. Use PLAYLIST TRACK DATA above to find key, bpm data for each track
   1. Prioritize tracks within ±5 BPM of the current track for the smoothest tempo transitions.  
-  2. Among BPM-similar tracks, choose the one with the closest Camelot key match to ensure harmonic compatibility.
+  2. Among BPM-similar tracks, choose the one with the closest Camelot key match to ensure harmonic compatibility. If no good key matches, closest BPM wins
       2a. Camelot key match can be determined by:
         -  adjacent Camelot numbers (±1) sharing the same letter (e.g., 8A↔9A) or as close as possible by number while maintaining the letter. 
         -  If no adjacent match, same number different letter is also good
@@ -62,13 +63,13 @@ export async function POST(req: Request) {
 
   
   RESPONSIBILITIES:
-  - Recommend **only** from the above playlist based on these guidelines, and always include the bpm/key of the current and recommended song as well as a brief explanation of why it's a good fit
+  - Recommend **only** from the above playlist based on these guidelines, and always include the bpm/key of the current (if available) and recommended song as well as a brief explanation of why it's a good fit
   - Provide info about the current track, any other track in the playlist, or the playlist itself
   - Provide concise, actionable advice with brief reasoning under three sentences.  
   
   TOOL GUIDELINES:
   - Use **getRecommendations** for transition suggestions leveraging this metadata. 
-  - Use **getTrackDetails** for on-demand BPM/key lookups if needed.
+  - Use **getTrackDetails** for fallback BPM/key lookups if needed.
   `;
   };
   

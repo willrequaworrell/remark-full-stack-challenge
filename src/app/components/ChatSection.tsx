@@ -36,7 +36,7 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
     e.preventDefault();
     handleSubmit(e, { body: { playlistId, playlistTracks, currentTrackId } });
   };
-  if (aiConsolidatedTrackData) console.log(aiConsolidatedTrackData)
+  
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
