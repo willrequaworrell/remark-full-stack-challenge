@@ -1,5 +1,5 @@
 import { CgLoadbarSound } from "react-icons/cg"
-import { PlaylistTrackCardType, SpotifyPlaylistTrack } from "../types/track"
+import { PlaylistTrackCardType } from "../types/track"
 
 interface PlaylistTrackProps {
     track: {

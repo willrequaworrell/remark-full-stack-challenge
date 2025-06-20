@@ -109,7 +109,7 @@ export function useSpotifyPlayer(options: PlaybackOptions) {
         await new Promise((r) => setTimeout(r, 500));
 
         // Construct play request
-        const playbackBody: Record<string, any> = {
+        const playbackBody: Record<string, string | number | {}> = {
           context_uri: options.playlistUri,
           position_ms: 0,
         };

@@ -30,9 +30,9 @@ export const consolidateMetadata = tool({
         .optional()
     })
   }),
-  execute: async ({ trackData }, _) => {
+  execute: async ({ trackData }, options) => {
     const { id, title, artist, getsongbmpData, webData } = trackData;
-
+    console.log(options)
     // Build system prompt for metadata extraction
     const systemPrompt = `
 You are a music metadata expert. Extract only valid JSON—absolutely no markdown fences (e.g., \`\`\`, “json”), no surrounding text.  

@@ -11,6 +11,6 @@ export interface SearchResultItem {
     htmlSnippet?: string;
     formattedUrl?: string;
     htmlFormattedUrl?: string;
-    pagemap?: Record<string, any>;
+    pagemap?: Record<string, []>;
   }
   
