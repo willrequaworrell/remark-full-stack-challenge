@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 import { useSpotifyPlayer } from "../hooks/useSpotifyPlayer";
 
 interface PlaybackOptions {
@@ -10,8 +11,8 @@ interface PlaybackOptions {
 }
 
 interface PlayerSectionProps {
-  options?: PlaybackOptions
-  onTrackChange: (trackId: string) => void
+  options?: PlaybackOptions;
+  onTrackChange: (trackId: string) => void;
 }
 
 export default function PlayerSection({ options, onTrackChange }: PlayerSectionProps) {
@@ -24,71 +25,82 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
     isPlaylistLoading
   } = useSpotifyPlayer(options || {});
 
+  const [livePosition, setLivePosition] = useState(0);
+
   const formatTime = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    if (isPlaying && playerState?.position !== undefined) {
+      intervalId = setInterval(() => {
+        setLivePosition(prev => prev + 100);
+      }, 100);
+    }
+    return () => clearInterval(intervalId);
+  }, [isPlaying, playerState?.position]);
+
+  useEffect(() => {
+    if (playerState?.position !== undefined) {
+      setLivePosition(playerState.position);
+    }
+  }, [playerState?.position]);
+
   const track = isPlaylistLoading
-  ? {
-      albumArt: "",
-      albumColor: "#d1d5dc",
-      title: "Loading...",
-      artist: "Loading...",
-      nowPlaying: "Loading",
-      currentTime: "00:00",
-      duration: "00:00",
-      progress: 0,
-    }
-  : playerState
-  ? {
-      albumArt: playerState.track_window?.current_track?.album?.images[0]?.url || "",
-      albumColor: "#d28ab6",
-      title: playerState.track_window?.current_track?.name || "No Track",
-      artist: playerState.track_window?.current_track?.artists?.map(a => a.name).join(", ") || "No Artist",
-      nowPlaying: "Now Playing",
-      currentTime: formatTime(playerState.position || 0),
-      duration: formatTime(playerState.track_window?.current_track?.duration_ms || 0),
-      progress: playerState.position && playerState.track_window?.current_track?.duration_ms
-        ? Math.round((playerState.position / playerState.track_window.current_track.duration_ms) * 100)
-        : 0,
-    }
-  : {
-      albumArt: "",
-      albumColor: "#d1d5dc",
-      title: "",
-      artist: "",
-      nowPlaying: "",
-      currentTime: "00:00",
-      duration: "00:00",
-      progress: 0,
-    };
-
-
-    useEffect(() => {
-      const newTrackId = playerState?.track_window.current_track.id;
-      if (newTrackId && onTrackChange) {
-        onTrackChange(newTrackId);  // Notify parent of current track change
+    ? {
+        albumArt: "",
+        albumColor: "#d1d5dc",
+        title: "Loading...",
+        artist: "Loading...",
+        currentTime: "00:00",
+        duration: "00:00",
+        progress: 0,
       }
-    }, [playerState, onTrackChange])
+    : playerState
+    ? {
+        albumArt: playerState.track_window?.current_track?.album?.images[0]?.url || "",
+        albumColor: "#d28ab6",
+        title: playerState.track_window?.current_track?.name || "No Track",
+        artist: playerState.track_window?.current_track?.artists?.map(a => a.name).join(", ") || "No Artist",
+        currentTime: formatTime(livePosition),
+        duration: formatTime(playerState.track_window?.current_track?.duration_ms || 0),
+        progress: playerState.track_window?.current_track?.duration_ms
+          ? Math.round((livePosition / playerState.track_window.current_track.duration_ms) * 100)
+          : 0,
+      }
+    : {
+        albumArt: "",
+        albumColor: "#d1d5dc",
+        title: "",
+        artist: "",
+        currentTime: "00:00",
+        duration: "00:00",
+        progress: 0,
+      };
+
+  useEffect(() => {
+    const newTrackId = playerState?.track_window.current_track.id;
+    if (newTrackId) onTrackChange(newTrackId);
+  }, [playerState, onTrackChange]);
 
   return (
     <section className="flex flex-col flex-1 min-h-0 p-4 border-b-2 border-black h-1/2 md:p-6">
       <h2 className="w-full mb-2 text-lg font-black tracking-tight text-left text-black uppercase md:text-xl">
-        Playing
+        NOW PLAYING
       </h2>
       <div className="flex flex-col items-center justify-center flex-1 w-full">
-        {/* Album Art */}
+        {/* Album Art (10% larger) */}
         <div
-          className="flex items-center justify-center w-24 h-24 mb-2 border-2 border-black md:w-32 md:h-32"
+          className="flex items-center justify-center mb-2 border-2 border-black w-28 h-28 md:w-36 md:h-36"
           style={{ background: track.albumColor }}
         >
           {isPlaylistLoading ? (
-            <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full">
               <div className="w-8 h-8 border-4 border-gray-300 rounded-full border-t-transparent animate-spin"></div>
-              {/* <p className="mt-2 text-sm text-gray-500">Loading tracks...</p> */}
-            </div> 
+            </div>
           ) : track.albumArt ? (
             <img src={track.albumArt} alt={track.title} className="object-cover w-full h-full" />
           ) : (
@@ -96,45 +108,46 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           )}
         </div>
 
-        {/* Now Playing Info */}
+        {/* Track Info */}
         <h3 className="text-xs md:text-sm font-black uppercase mb-0.5 tracking-tight text-black">
           {track.title}
         </h3>
         <p className="mb-1 text-xs font-semibold text-black">{track.artist}</p>
+        
         {/* Controls */}
         <div className="flex items-center justify-center mb-2 space-x-2">
           <button
             onClick={handlePrevious}
             disabled={!playerState}
-            className="flex items-center justify-center w-6 h-6 transition border-2 border-black rounded-full hover:bg-black hover:text-white disabled:opacity-50"
+            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
           >
-            {/* Previous Icon */}
+            <FaStepBackward size={12} />
           </button>
           <button
             onClick={togglePlayback}
             disabled={!playerState}
-            className={`w-7 h-7 border-2 border-black rounded-full flex items-center justify-center ${
-              isPlaying ? "bg-white text-black" : "bg-black text-white"
-            } hover:bg-white hover:text-black transition disabled:opacity-50`}
+            className="flex items-center justify-center text-white transition-colors bg-black rounded-full w-7 h-7 hover:bg-white hover:text-black disabled:opacity-50"
           >
-            {/* Play/Pause Icons */}
+            {isPlaying ? <FaPause size={14} /> : <FaPlay size={14} />}
           </button>
           <button
             onClick={handleNext}
             disabled={!playerState}
-            className="flex items-center justify-center w-6 h-6 transition border-2 border-black rounded-full hover:bg-black hover:text-white disabled:opacity-50"
+            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
           >
-            {/* Next Icon */}
+            <FaStepForward size={12} />
           </button>
         </div>
-        {/* Progress Bar */}
-        <div className="w-full h-1 mb-1 bg-gray-200 border-2 border-black rounded">
+
+        {/* Progress Bar - Fixed alignment */}
+        <div className="relative w-full h-2 mb-1 overflow-hidden border-2 border-black rounded">
           <div
-            className="h-1 bg-[#d28ab6] rounded"
+            className="absolute top-0 left-0 h-full bg-[#d28ab6] rounded-sm"
             style={{ width: `${track.progress}%` }}
           ></div>
         </div>
-        {/* Time Info */}
+
+        {/* Time Display */}
         <div className="flex justify-between w-full font-mono text-xs text-black">
           <span>{track.currentTime}</span>
           <span>{track.duration}</span>
