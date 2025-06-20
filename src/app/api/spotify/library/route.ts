@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { authOptions } from "../../auth/[...nextauth]/route";
+import { SpotifyPlaylistTrack } from "@/app/types/track";
 
 export async function GET() {
   try {
@@ -23,14 +24,12 @@ export async function GET() {
     const data = await response.json();
     
     // Transform the data to include only what we need
-    const tracks = data.items.map((item: any) => ({
+    const tracks = data.items.map((item: SpotifyPlaylistTrack) => ({
       id: item.track.id,
       name: item.track.name,
       artist: item.track.artists[0]?.name,
-      album: item.track.album.name,
+      album: item.track.album,
       uri: item.track.uri,
-      external_url: item.track.external_urls.spotify,
-      added_at: item.added_at,
     }));
 
     return NextResponse.json({ 

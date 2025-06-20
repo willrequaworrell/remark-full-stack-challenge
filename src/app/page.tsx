@@ -7,7 +7,7 @@ import PlayerSection from "./components/PlayerSection";
 import PlaylistSection from "./components/PlaylistSection";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { PlaybackOptions } from "./types/playback";
-import { ConsolidatedTrack, EnrichedTrack, SpotifyPlaylistTrack } from "./types/track";
+import { ConsolidatedTrack, EnrichedTrack, PlaylistTrackCardType, SpotifyPlaylistTrack } from "./types/track";
 
 
 export default function Page() {
@@ -86,7 +86,7 @@ export default function Page() {
   }, [selectedPlaylist, playbackOptions.playlistUri]);
 
   // Handle track click
-  const handleTrackClick = (track: any, trackIndex: number) => {
+  const handleTrackClick = (track: PlaylistTrackCardType, trackIndex: number) => {
     setPlaybackOptions({
       playlistUri: `spotify:playlist:${selectedPlaylist}`,
       trackUri: track.uri,

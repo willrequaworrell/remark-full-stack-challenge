@@ -3,11 +3,12 @@
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { SpotifyPlaylist } from "../types/spotify";
 
 export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) => void }) {
   const { data: session, status } = useSession();
   
-  const [playlists, setPlaylists] = useState<any[]>([]);
+  const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

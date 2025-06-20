@@ -1,25 +1,9 @@
-// app/api/metadata/consolidate/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { consolidateMetadata } from '@/lib/tools/consolidateMetadata';
-import { useState } from 'react';
 import { nanoid } from 'zod/v4';
 import type { CoreMessage } from 'ai';
+import { EnrichedTrack } from '@/app/types/track';
 
-interface EnrichedTrack {
-    id: string;
-    title: string;
-    artist: string;
-    bpm?: number;
-    key?: string;
-    danceability?: number;
-    energy?: number;
-    webData?: { results: { snippet: string; link: string }[] } | { error: string; suggestion: string };
-    source: 'getsongbpm' | 'websearch' | 'failed';
-    timestamp: number;
-  }
-  
- 
-  
 
 interface ConsolidationRequest {
   enrichedTracks: EnrichedTrack[];

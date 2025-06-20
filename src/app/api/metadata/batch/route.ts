@@ -86,7 +86,6 @@ export async function POST(req: NextRequest) {
           )
         )
       );
-    //   console.log(results)
       enrichedTracks.push(...results.filter(r => r !== null) as TrackMetadata[]);
       if (i + BATCH_SIZE < playlistTracks.length) {
         await new Promise(r => setTimeout(r, BATCH_DELAY));
@@ -100,9 +99,9 @@ export async function POST(req: NextRequest) {
       totalRequested: playlistTracks.length,
       timestamp: Date.now(),
     });
-  } catch (err: any) {
+  } catch (err) {
     return NextResponse.json(
-      { error: 'Batch processing failed', details: err.message },
+      { error: 'Batch processing failed', details: err },
       { status: 500 }
     );
   }

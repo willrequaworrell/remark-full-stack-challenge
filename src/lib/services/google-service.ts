@@ -1,3 +1,5 @@
+import { SearchResultItem } from "@/app/types/google";
+
 export async function searchWebForTrackDetails(
     songTitle: string,
     artistName?: string
@@ -19,7 +21,7 @@ export async function searchWebForTrackDetails(
     }
   
     const data = await res.json();
-    const items = data.items?.slice(0, 5).map((item: any) => ({
+    const items = data.items?.slice(0, 5).map((item: SearchResultItem) => ({
       snippet: item.snippet,
       link:    item.link
     }));

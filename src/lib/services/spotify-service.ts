@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { SpotifyPlaylistTrack } from "@/app/types/track";
 
 export async function getSpotifyAccessToken() {
   const session = await getServerSession(authOptions);
@@ -16,7 +17,7 @@ export async function getPlaylistTracks(playlistId: string) {
     );
     if (!response.ok) throw new Error(`Failed to fetch playlist tracks: ${response.status}`);
     const data = await response.json();
-    return data.items.map((item: any) => ({
+    return data.items.map((item: SpotifyPlaylistTrack) => ({
       id: item.track.id,
       name: item.track.name,
       artist: item.track.artists[0].name,

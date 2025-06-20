@@ -1,10 +1,10 @@
 import PlaylistTrack from "./PlaylistTrack";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { SpotifyPlaylistTrack } from "../types/track";
+import { PlaylistTrackCardType, SpotifyPlaylistTrack } from "../types/track";
 
 interface PlaylistSectionProps {
   playlistTracks: SpotifyPlaylistTrack[]
-  onTrackClick: (track: any, index: number) => void;
+  onTrackClick: (track: PlaylistTrackCardType, index: number) => void;
   currentTrackId: string;
 }
 
@@ -19,7 +19,7 @@ const PlaylistSection = ({playlistTracks, onTrackClick, currentTrackId}: Playlis
         {playlistTracks.length === 0 ? (
           <LoadingSpinner size={8}/>
         ) : 
-          playlistTracks?.map((item: any, index: number) => {
+          playlistTracks?.map((item: SpotifyPlaylistTrack, index: number) => {
             const track = {
               id: item.track.id,
               name: item.track.name,

@@ -1,23 +1,10 @@
 import { openai } from '@ai-sdk/openai';
-import { streamText, tool } from 'ai';
+import { streamText } from 'ai';
 import { getPlaylistTracksFromSpotify } from '@/lib/tools/spotify';
 import { getTrackDetails } from '@/lib/tools/getsongbpm';
 import { getRecommendations } from '@/lib/tools/getRecommendations';
 
 
-interface CompatibleTrack {
-  name: string;
-  artist: string;
-  bpm: number;
-  key: string;
-  spotify_id: string;
-}
-
-interface PlaylistTrack {
-  id: string;
-  name: string;
-  artist: string;
-}
 
 interface ConsolidatedTrack {
   trackId: string;
@@ -32,7 +19,7 @@ interface ConsolidatedTrack {
 
 
 export async function POST(req: Request) {
-  const { messages, playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData } = await req.json();
+  const { messages, playlistId, currentTrackId, aiConsolidatedTrackData } = await req.json();
   
   
   
@@ -60,23 +47,27 @@ export async function POST(req: Request) {
   PLAYLIST TRACK DATA:
   ${trackList}
   
+  MUSICAL KEYS → CAMELOT KEYS MAP:
+  C Major → 8B; A minor → 8A; G Major → 9B; E minor → 9A; D Major → 10B; B minor → 10A;
+  A Major → 11B; F♯ minor → 11A; E Major → 12B; C♯ minor → 12A; B Major → 1B; G♯ minor → 1A
+
+
   HARMONIC MIXING GUIDELINES:
   1. Prioritize tracks within ±5 BPM of the current track for the smoothest tempo transitions.  
   2. Among BPM-similar tracks, choose the one with the closest Camelot key match to ensure harmonic compatibility.
       2a. Camelot key match can be determined by:
         -  adjacent Camelot numbers (±1) sharing the same letter (e.g., 8A↔9A) or as close as possible by number while maintaining the letter. 
         -  If no adjacent match, same number different letter is also good
-  
-  MUSICAL KEYS → CAMELOT KEYS MAP:
-  C Major → 8B; A minor → 8A; G Major → 9B; E minor → 9A; D Major → 10B; B minor → 10A;
-  A Major → 11B; F♯ minor → 11A; E Major → 12B; C♯ minor → 12A; B Major → 1B; G♯ minor → 1A
+  3. Provide both CURRENT and RECOMMENDED songs BPM/key in your answer.
+
   
   RESPONSIBILITIES:
-  - Recommend **only** from the above playlist based on these guidelines.  
+  - Recommend **only** from the above playlist based on these guidelines, and always include the bpm/key of the current and recommended song as well as a brief explanation of why it's a good fit
+  - Provide info about the current track, any other track in the playlist, or the playlist itself
   - Provide concise, actionable advice with brief reasoning under three sentences.  
   
   TOOL GUIDELINES:
-  - Use **getRecommendations** for transition suggestions leveraging this metadata.  
+  - Use **getRecommendations** for transition suggestions leveraging this metadata. 
   - Use **getTrackDetails** for on-demand BPM/key lookups if needed.
   `;
   };

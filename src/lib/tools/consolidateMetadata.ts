@@ -30,7 +30,7 @@ export const consolidateMetadata = tool({
         .optional()
     })
   }),
-  execute: async ({ trackData }, options) => {
+  execute: async ({ trackData }, _) => {
     const { id, title, artist, getsongbmpData, webData } = trackData;
 
     // Build system prompt for metadata extraction

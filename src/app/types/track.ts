@@ -35,3 +35,11 @@ export interface ConsolidatedTrack {
   reasoning: string;
 }
 
+
+export interface PlaylistTrackCardType {
+  id: string
+  name: string
+  artist: string
+  uri: string
+  albumArt: string
+}

@@ -1,12 +1,13 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react"; 
-import { useSession, signIn } from "next-auth/react"; 
+import { useChat } from "@ai-sdk/react";
+import { useSession, signIn } from "next-auth/react";
 import { useRef, useEffect, FormEvent, useMemo } from "react";
 import { PiDotsThreeOutlineDuotone } from "react-icons/pi";
 import { ConsolidatedTrack, SpotifyPlaylistTrack } from "../types/track";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
+import ChatMessageLoading from "./ChatMessageLoading";
 
 interface ChatSectionProps {
   playlistId: string;
@@ -15,34 +16,28 @@ interface ChatSectionProps {
   aiConsolidatedTrackData: ConsolidatedTrack[];
 }
 
-const ChatSection = ({playlistId, playlistTracks,currentTrackId, aiConsolidatedTrackData}: ChatSectionProps) => {
-
-  const { data: session } = useSession();  
-  const chatConfig = useMemo(() => ({
-    api: "/api/chat",
-    body: { playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData }
-  }), [playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData]);
-  const { 
-    messages, 
-    input, 
-    handleInputChange, 
-    handleSubmit, 
-    isLoading } = useChat(chatConfig);
-  
+const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData,}: ChatSectionProps) => {
+  const { data: session } = useSession();
+  const chatConfig = useMemo(
+    () => ({
+      api: "/api/chat",
+      body: { playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData },
+    }),
+    [playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData]
+  );
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat(chatConfig);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to newest message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handler for form submission
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSubmit(e, { body: { playlistId, playlistTracks, currentTrackId } });
   };
 
-  // Prompt login if no session
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
@@ -62,20 +57,26 @@ const ChatSection = ({playlistId, playlistTracks,currentTrackId, aiConsolidatedT
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-black uppercase md:text-xl">DJ AI</h2>
       </div>
-      
-      <div className="flex-1 mb-3 space-y-3 overflow-y-auto custom-scrollbar">
-        {messages.map((message, idx) => (
-          <ChatMessage
-            message={message}
-            index={idx}
-          />
-        ))}
 
-        {isLoading && (
-          <div className="flex justify-start">
-            <PiDotsThreeOutlineDuotone className="w-6 h-6 text-gray-500 animate-pulse" />
-          </div>
-        )}
+      <div className="flex-1 mb-3 space-y-3 overflow-y-auto custom-scrollbar">
+        {messages.map((message, idx) => {
+          // Detect if this assistant message is still empty
+          const hasText = message.parts.some(
+            (p) => p.type === "text" && p.text.trim() !== ""
+          );
+
+          // While loading and this is the new assistant stub, show placeholder bubble
+          if (isLoading && message.role === "assistant" && !hasText) {
+            return (
+              <ChatMessageLoading idx={idx}/>
+            );
+          }
+
+          // Otherwise render the normal message bubble
+          return (
+            <ChatMessage key={message.id ?? idx} message={message} index={idx} />
+          );
+        })}
 
         <div ref={chatEndRef} />
       </div>
@@ -84,11 +85,10 @@ const ChatSection = ({playlistId, playlistTracks,currentTrackId, aiConsolidatedT
         value={input}
         disabled={isLoading}
         onChange={handleInputChange}
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
       />
     </section>
   );
-}
+};
 
-
-export default ChatSection
+export default ChatSection;
