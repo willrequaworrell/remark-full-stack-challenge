@@ -1,5 +1,5 @@
 import { FormEvent } from "react"
-import { TbSend2 } from "react-icons/tb"
+import { IoSend } from "react-icons/io5"
 
 interface ChatInputProps {
     value: string
@@ -16,16 +16,16 @@ const ChatInput = ({value, disabled, onChange, onSubmit}: ChatInputProps) => {
           type="text"
           value={value}
           onChange={onChange}
-          placeholder="Type your message..."
+          placeholder="Ask about your playlist, or what to play next..."
           disabled={disabled}
           className="flex-1 px-4 py-2 border-2 border-black rounded-full focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-70 disabled:bg-gray-100"
         />
         <button
           type="submit"
           disabled={disabled}
-          className="flex items-center justify-center w-10 h-10 text-black transition-colors bg-white border-2 border-black rounded-full hover:bg-black hover:text-white disabled:opacity-70 disabled:bg-gray-100"
+          className="flex items-center justify-center w-10 h-10 text-white transition-colors bg-black border-2 border-black rounded-full cursor-pointer hover:text-black hover:bg-white disabled:opacity-70 disabled:bg-gray-100"
         >
-          <TbSend2 className="-rotate-90"/>
+          <IoSend className="-rotate-90"/>
 
         </button>
       </form>

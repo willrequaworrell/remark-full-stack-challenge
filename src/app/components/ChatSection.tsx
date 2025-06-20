@@ -40,7 +40,7 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
-        <h1 className="mb-4 text-2xl font-black">AI Music Assistant</h1>
+        <h1 className="mb-4 text-2xl font-black">AI Playlist Assistant</h1>
         <button
           onClick={() => signIn("spotify")}
           className="px-6 py-3 text-white bg-green-500 rounded-lg hover:bg-green-600"
@@ -52,9 +52,9 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
   }
 
   return (
-    <section className="flex flex-col w-full lg:w-[38.2%] p-4 md:p-6 h-full border-l-2 border-black">
+    <section className="flex flex-col w-full lg:w-[38.2%] p-4 md:p-6 h-full border-black">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-black uppercase md:text-xl">DJ AI</h2>
+        <h2 className="text-lg font-black md:text-xl">AI Disk Jockey</h2>
       </div>
 
       <div className="flex-1 mb-3 space-y-3 overflow-y-auto custom-scrollbar">

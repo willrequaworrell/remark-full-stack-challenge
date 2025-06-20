@@ -1,10 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
+import { FaStepBackward, FaStepForward } from "react-icons/fa";
 import { useSpotifyPlayer } from "../hooks/useSpotifyPlayer";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { PlaybackOptions } from "../types/playback";
-
+import PlaySVG from "./PlaySVG";
+import PauseSVG from "./PauseSVG";
 
 interface PlayerSectionProps {
   options?: PlaybackOptions;
@@ -84,13 +85,13 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
 
   return (
     <section className="flex flex-col flex-1 min-h-0 p-4 border-b-2 border-black h-1/2 md:p-6">
-      <h2 className="w-full mb-2 text-lg font-black tracking-tight text-left text-black uppercase font-barrio md:text-xl">
-        NOW PLAYING
+      <h2 className="w-full mb-2 text-lg font-black tracking-tight text-left text-black md:text-xl">
+        Now Playing
       </h2>
       <div className="flex flex-col items-center justify-center flex-1 w-full">
         {/* Album Art */}
         <div
-          className="flex items-center justify-center mb-2 border-2 border-black w-28 h-28 md:w-36 md:h-36"
+          className="flex items-center justify-center mb-2 border-2 border-black w-28 h-28 md:w-40 md:h-40"
           style={{ background: track.albumColor }}
         >
           {isPlaylistLoading ? (
@@ -113,21 +114,25 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           <button
             onClick={handlePrevious}
             disabled={!playerState}
-            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black border-2 border-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
+            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black border-2 border-black rounded-full cursor-pointer hover:bg-white hover:text-black disabled:opacity-50"
           >
             <FaStepBackward size={12} />
           </button>
           <button
             onClick={togglePlayback}
             disabled={!playerState}
-            className="flex items-center justify-center text-center text-white transition-colors bg-black border-2 border-black rounded-full w-7 h-7 hover:bg-white hover:text-black disabled:opacity-50"
+            className="flex items-center justify-center text-white transition-colors bg-black border-2 border-black rounded-full cursor-pointer w-7 h-7 hover:bg-white hover:text-black disabled:opacity-50"
           >
-            {isPlaying ? <FaPause size={14} /> : <FaPlay size={14} />}
+            {isPlaying ? (
+              <PauseSVG/>
+            ) : (
+              <PlaySVG/>
+            )}
           </button>
           <button
             onClick={handleNext}
             disabled={!playerState}
-            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black border-2 border-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
+            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black border-2 border-black rounded-full cursor-pointer hover:bg-white hover:text-black disabled:opacity-50"
           >
             <FaStepForward size={12} />
           </button>
@@ -135,7 +140,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
 
         <div className="relative w-full h-2 mb-1 overflow-hidden border-2 border-black rounded">
           <div
-            className="absolute top-0 left-0 h-full rounded-sm bg-accent"
+            className="absolute top-0 left-0 h-full bg-black rounded-sm"
             style={{ width: `${track.progress}%` }}
           ></div>
         </div>

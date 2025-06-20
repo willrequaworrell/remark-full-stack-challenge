@@ -64,6 +64,7 @@ export async function POST(req: Request) {
   
   RESPONSIBILITIES:
   - Recommend **only** from the above playlist based on these guidelines, and always include the bpm/key of the current (if available) and recommended song as well as a brief explanation of why it's a good fit
+  - if there's none that fit in the criteria, then recommend the closest track in bpm but explain it's not likely to be as smooth
   - Provide info about the current track, any other track in the playlist, or the playlist itself
   - Provide concise, actionable advice with brief reasoning under three sentences.  
   
@@ -77,7 +78,7 @@ export async function POST(req: Request) {
   
   try {
     const prompt = createSystemPrompt(playlistId, currentTrackId, aiConsolidatedTrackData)
-    // console.log(prompt)
+    console.log(prompt)
     const result = streamText({
       model: openai('gpt-4o'),
       maxSteps: 10, // Conservative buffer for complex interactions

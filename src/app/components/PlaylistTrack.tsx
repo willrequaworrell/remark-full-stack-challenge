@@ -47,7 +47,7 @@ const PlaylistTrack = ({track, index, currentTrackId, onClickPlay}: PlaylistTrac
                 
                 <button
                     onClick={() => onClickPlay?.(track, index)}
-                    className="items-center justify-center hidden w-8 h-8 ml-2 transition-all border-2 border-black rounded-full group-hover:flex hover:bg-black hover:text-white"
+                    className="items-center justify-center hidden w-8 h-8 ml-2 text-white transition-all bg-black border-2 border-black rounded-full cursor-pointer group-hover:flex hover:bg-white hover:text-black"
                 >
                     
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">

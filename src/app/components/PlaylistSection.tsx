@@ -12,7 +12,7 @@ const PlaylistSection = ({playlistTracks, onTrackClick, currentTrackId}: Playlis
 
   return (
     <section className="flex flex-col flex-1 min-h-0 p-4 h-1/2 md:p-6">
-      <h2 className="mb-3 text-lg font-black tracking-tight text-black uppercase md:text-xl md:mb-4">
+      <h2 className="mb-3 text-lg font-black tracking-tight text-black md:text-xl md:mb-4">
         Playlist
       </h2>
       <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar">

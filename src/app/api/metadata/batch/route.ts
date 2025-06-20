@@ -52,7 +52,6 @@ async function fetchTrackMetadataWithFallback(
       }
   
       const webSearchResults = await searchWebForTrackDetails(songTitle, artistName);
-      console.log(webSearchResults)
       return {
         ...base,
         webData: webSearchResults,

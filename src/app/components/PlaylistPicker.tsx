@@ -4,6 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { SpotifyPlaylist } from "../types/spotify";
+import SpotifyLogin from "./SpotifyLogin";
 
 export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) => void }) {
   const { data: session, status } = useSession();
@@ -63,15 +64,7 @@ export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) =>
 
   if (!session) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="mb-4 text-2xl font-bold">AI Music Assistant</h1>
-        <button
-          onClick={() => signIn("spotify")}
-          className="px-6 py-3 text-white bg-green-500 rounded-lg hover:bg-green-600"
-        >
-          Sign in with Spotify
-        </button>
-      </div>
+      <SpotifyLogin/>
     );
   }
 
@@ -129,7 +122,7 @@ export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) =>
             <button
               key={playlist.id}
               onClick={() => onSelect(playlist.id)}
-              className="w-full p-3 text-left transition-colors border-2 border-black rounded-lg hover:bg-gray-100"
+              className="w-full p-3 text-left transition-colors border-2 border-black rounded-lg cursor-pointer hover:bg-gray-100"
             >
               <strong>{playlist.name}</strong>
               <p className="text-sm text-gray-500">{playlist.tracks.total} tracks</p>
