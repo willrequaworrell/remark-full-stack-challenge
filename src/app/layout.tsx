@@ -6,6 +6,7 @@ import "./globals.css";
 import { RootProvider } from "./providers/root-provider";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { AppErrorBoundary } from "./providers/error-boundary";
+import { TbLoader3 } from "react-icons/tb";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -46,6 +47,7 @@ const StaticFooter = () => (
 
 const GlobalLoading = () => (
   <div className="flex items-center justify-center min-h-screen">
-    <div className="w-12 h-12 border-t-2 border-b-2 border-gray-900 rounded-full animate-spin" />
+    <TbLoader3 className="w-12 h-12 animate-spin" />
+    
   </div>
 );

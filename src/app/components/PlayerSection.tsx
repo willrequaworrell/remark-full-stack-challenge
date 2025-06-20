@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 import { useSpotifyPlayer } from "../hooks/useSpotifyPlayer";
+import { TbLoader3 } from "react-icons/tb";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface PlaybackOptions {
   playlistUri?: string;
@@ -52,7 +54,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
   const track = isPlaylistLoading
     ? {
         albumArt: "",
-        albumColor: "#d1d5dc",
+        albumColor: "#ffffff",
         title: "Loading...",
         artist: "Loading...",
         currentTime: "00:00",
@@ -62,7 +64,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
     : playerState
     ? {
         albumArt: playerState.track_window?.current_track?.album?.images[0]?.url || "",
-        albumColor: "#d28ab6",
+        albumColor: "#ffffff",
         title: playerState.track_window?.current_track?.name || "No Track",
         artist: playerState.track_window?.current_track?.artists?.map(a => a.name).join(", ") || "No Artist",
         currentTime: formatTime(livePosition),
@@ -73,7 +75,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
       }
     : {
         albumArt: "",
-        albumColor: "#d1d5dc",
+        albumColor: "#ffffff",
         title: "",
         artist: "",
         currentTime: "00:00",
@@ -98,9 +100,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           style={{ background: track.albumColor }}
         >
           {isPlaylistLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="w-8 h-8 border-4 border-gray-300 rounded-full border-t-transparent animate-spin"></div>
-            </div>
+            <LoadingSpinner size={8}/> 
           ) : track.albumArt ? (
             <img src={track.albumArt} alt={track.title} className="object-cover w-full h-full" />
           ) : (
@@ -119,21 +119,21 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           <button
             onClick={handlePrevious}
             disabled={!playerState}
-            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
+            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black border-2 border-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
           >
             <FaStepBackward size={12} />
           </button>
           <button
             onClick={togglePlayback}
             disabled={!playerState}
-            className="flex items-center justify-center text-white transition-colors bg-black rounded-full w-7 h-7 hover:bg-white hover:text-black disabled:opacity-50"
+            className="flex items-center justify-center text-center text-white transition-colors bg-black border-2 border-black rounded-full w-7 h-7 hover:bg-white hover:text-black disabled:opacity-50"
           >
             {isPlaying ? <FaPause size={14} /> : <FaPlay size={14} />}
           </button>
           <button
             onClick={handleNext}
             disabled={!playerState}
-            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
+            className="flex items-center justify-center w-6 h-6 text-white transition-colors bg-black border-2 border-black rounded-full hover:bg-white hover:text-black disabled:opacity-50"
           >
             <FaStepForward size={12} />
           </button>

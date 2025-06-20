@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useSpotifyTracks } from "../hooks/useSpotifyTracks";
 import PlaylistTrack from "./PlaylistTrack";
+import { TbLoader3 } from "react-icons/tb";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export default function PlaylistSection({
   playlistId,
@@ -13,7 +15,6 @@ export default function PlaylistSection({
   onTrackClick: (track: any, index: number) => void;
   currentTrackId: string;
 }) {
-  // const { data, loading, error } = useSpotifyTracks("playlist", playlistId);
   
 
   return (
@@ -23,10 +24,7 @@ export default function PlaylistSection({
       </h2>
       <div className="flex-1 space-y-3 overflow-y-auto custom-scrollbar">
         {playlistTracks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="w-8 h-8 border-4 border-gray-300 rounded-full border-t-transparent animate-spin"></div>
-            {/* <p className="mt-2 text-sm text-gray-500">Loading tracks...</p> */}
-          </div> 
+          <LoadingSpinner size={8}/>
         ) : 
           playlistTracks?.map((item: any, index: number) => {
             const track = {
