@@ -1,9 +1,9 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useEffect } from "react";
 
-export default function PlaylistPicker({ onSelect}: { onSelect: (id: string) => void}) {
+export default function PlaylistPicker({ onSelect }: { onSelect: (id: string) => void }) {
   const { data: session, status } = useSession();
   
   const [playlists, setPlaylists] = useState<any[]>([]);
@@ -11,25 +11,53 @@ export default function PlaylistPicker({ onSelect}: { onSelect: (id: string) => 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('using effect', status, session)
-    if (status !== "authenticated" || !session?.accessToken) return;
-    
-    setLoading(true);
-    setError(null);
+    const fetchPlaylists = async () => {
+      if (status !== "authenticated" || !session?.accessToken) return;
+      
+      setLoading(true);
+      setError(null);
 
-    fetch("https://api.spotify.com/v1/me/playlists", {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    })
-      .then((res) => res.ok ? res.json() : Promise.reject(new Error(`Failed to fetch playlists: ${res.status}`)))
-      .then((data) => setPlaylists(data.items))
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to fetch playlists"))
-      .finally(() => setLoading(false));
-  }, [session?.accessToken, status, session]);
+      try {
+        const response = await fetch("https://api.spotify.com/v1/me/playlists", {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        });
 
+        if (!response.ok) {
+          // Handle specific Spotify API error codes
+          if (response.status === 401) {
+            throw new Error("Your Spotify session has expired. Please sign out and sign back in.");
+          } else if (response.status === 403) {
+            throw new Error("Access denied. Please check your Spotify permissions.");
+          } else if (response.status >= 500) {
+            throw new Error("Spotify servers are currently unavailable. Please try again later.");
+          } else {
+            throw new Error(`Failed to fetch playlists (Error ${response.status}). Please try again.`);
+          }
+        }
 
+        const data = await response.json();
+        setPlaylists(data.items || []);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unexpected error occurred while fetching playlists.");
+        }
+        console.error("Playlist fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlaylists();
+  }, [session?.accessToken, status]);
 
   if (status === "loading") {
-    return <div className="flex flex-col items-center justify-center min-h-screen">Loading session...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        Loading session...
+      </div>
+    );
   }
 
   if (!session) {
@@ -46,9 +74,46 @@ export default function PlaylistPicker({ onSelect}: { onSelect: (id: string) => 
     );
   }
 
-  if (loading) return <div className="flex flex-col items-center justify-center min-h-screen">Loading your playlists...</div>;
-  if (error) return <div className="flex flex-col items-center justify-center min-h-screen text-red-500">{error}</div>;
-  if (playlists.length === 0) return <div className="flex flex-col items-center justify-center min-h-screen">No playlists found.</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        Loading your playlists...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="max-w-md p-6 text-center border border-red-200 rounded-lg bg-red-50">
+          <h2 className="mb-2 text-lg font-semibold text-red-800">Unable to Load Playlists</h2>
+          <p className="mb-4 text-red-600">{error}</p>
+          <div className="space-x-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => signOut()}
+              className="px-4 py-2 text-red-600 border border-red-600 rounded hover:bg-red-50"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (playlists.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        No playlists found.
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
