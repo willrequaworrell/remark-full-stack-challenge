@@ -99,7 +99,6 @@ export default function Page() {
     return <PlaylistPicker onSelect={setSelectedPlaylist}/>;
   }
 
-  if (aiConsolidatedTrackData) console.log(aiConsolidatedTrackData)
   return (
     <div className="flex items-center justify-center min-h-screen grid-bg">
       <div className="main-flex max-w-7xl w-full border-2 border-black rounded-xl overflow-hidden bg-white h-[90vh] flex flex-col lg:flex-row">
