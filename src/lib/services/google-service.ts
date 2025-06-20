@@ -16,6 +16,7 @@ export async function searchWebForTrackDetails(
     const query = `${songTitle}${artistName ? ` by ${artistName}` : ''} BPM key`;
     const url   = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&num=5`;
     const res   = await fetch(url);
+    console.log(url)
     if (!res.ok) {
       return { error: `Web search failed (${res.status})`, suggestion: 'Try again later' };
     }
