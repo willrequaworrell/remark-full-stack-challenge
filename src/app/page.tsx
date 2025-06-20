@@ -99,6 +99,7 @@ export default function Page() {
     return <PlaylistPicker onSelect={setSelectedPlaylist}/>;
   }
 
+  if (aiConsolidatedTrackData) console.log(aiConsolidatedTrackData)
   return (
     <div className="flex items-center justify-center min-h-screen grid-bg">
       <div className="main-flex max-w-7xl w-full border-2 border-black rounded-xl overflow-hidden bg-white h-[90vh] flex flex-col lg:flex-row">
@@ -127,7 +128,7 @@ export default function Page() {
             : 
             <div className="flex flex-col lg:w-[38.2%] w-full p-4 md:p-6 h-full border-l-2 border-black">
               <div className="flex items-center justify-between mb-2">
-                <h2 className="text-lg font-black uppercase">DJ AI</h2>
+                <h2 className="text-lg font-black uppercase md:text-xl">DJ AI</h2>
               </div>
               <LoadingSpinner
                 size={8}
