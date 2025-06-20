@@ -5,39 +5,20 @@ import ChatSection from "./components/ChatSection";
 import PlaylistPicker from "./components/PlaylistPicker";
 import PlayerSection from "./components/PlayerSection";
 import PlaylistSection from "./components/PlaylistSection";
-import { TbLoader3 } from "react-icons/tb";
-import { signOut } from "next-auth/react";
 import { LoadingSpinner } from "./components/LoadingSpinner";
+import { PlaybackOptions } from "./types/playback";
+import { ConsolidatedTrack, EnrichedTrack, SpotifyPlaylistTrack } from "./types/track";
 
-interface PlaybackOptions {
-  playlistUri?: string;
-  initialTrackIndex?: number;
-  trackUri?: string;
-  trackPosition?: number;
-}
-
-interface EnrichedTrack {
-  id: string;
-  title: string;
-  artist: string;
-  bpm?: number;
-  key?: string;
-  danceability?: number;
-  energy?: number;
-  webData?: { results: { snippet: string; link: string }[] } | { error: string; suggestion: string };
-  source: 'getsongbpm' | 'websearch' | 'failed';
-  timestamp: number;
-}
 
 export default function Page() {
   const [selectedPlaylist, setSelectedPlaylist] = useState<string | null>(null);
   const [playbackOptions, setPlaybackOptions] = useState<PlaybackOptions>({});
   const [currentTrackId, setCurrentTrackId] = useState<string>("");
-  const [playlistTracks, setPlaylistTracks] = useState<any[]>([]);
+  const [playlistTracks, setPlaylistTracks] = useState<SpotifyPlaylistTrack[]>([]);
   const [enrichedTracks, setEnrichedTracks] = useState<EnrichedTrack[]>([]);
   const [metadataLoading, setMetadataLoading] = useState<boolean>(false);
-  const [aiConsolidatedTrackData, setAiConsolidatedTrackData] = useState<any[]>([]);
-  const [aiConsolidatedTrackDataLoading, setAiConsolidatedTrackDataLoading] = useState(false);
+  const [aiConsolidatedTrackData, setAiConsolidatedTrackData] = useState<ConsolidatedTrack[]>([]);
+  const [aiConsolidatedTrackDataLoading, setAiConsolidatedTrackDataLoading] = useState<boolean>(false);
 
   // Fetch tracks when playlist is selected
   useEffect(() => {
@@ -55,7 +36,7 @@ export default function Page() {
     fetchPlaylistTracks();
   }, [selectedPlaylist]);
 
-  // Batch metadata enrichment
+  // when playlist data received, send for batch track details analysis
   useEffect(() => {
     const fetchAndEnrich = async () => {
       if (!selectedPlaylist || playlistTracks.length === 0 || !currentTrackId) return;
@@ -70,9 +51,9 @@ export default function Page() {
       setMetadataLoading(false);
     };
     fetchAndEnrich();
-  }, [selectedPlaylist, playlistTracks, currentTrackId]);
+  }, [selectedPlaylist, playlistTracks]);
 
-  // AI consolidation
+  // With raw track detail results, use AI to consolidate and reconcile into JSON 
   useEffect(() => {
     if (enrichedTracks.length === 0) return;
     const fetchConsolidation = async () => {
@@ -94,7 +75,7 @@ export default function Page() {
     fetchConsolidation();
   }, [enrichedTracks]);
 
-  // Initialize playback options
+  // Initialize + sync playback options
   useEffect(() => {
     if (selectedPlaylist && !playbackOptions.playlistUri) {
       setPlaybackOptions({
@@ -114,10 +95,6 @@ export default function Page() {
     setCurrentTrackId(track.id);
   };
 
-  const handlePlayerTrackChange = (trackId: string) => {
-    setCurrentTrackId(trackId);
-  };
-
   if (!selectedPlaylist) {
     return <PlaylistPicker onSelect={setSelectedPlaylist}/>;
   }
@@ -129,10 +106,9 @@ export default function Page() {
         <div className="flex flex-col border-b-2 border-black lg:border-b-0 lg:border-r-2 lg:w-[61.8%] w-full h-full">
           <PlayerSection 
             options={playbackOptions}
-            onTrackChange={handlePlayerTrackChange} 
+            onTrackChange={(trackId: string) => setCurrentTrackId(trackId)} 
           />
           <PlaylistSection
-            playlistId={selectedPlaylist}
             playlistTracks={playlistTracks}
             onTrackClick={handleTrackClick}
             currentTrackId={currentTrackId}

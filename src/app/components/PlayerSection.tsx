@@ -2,15 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { FaPlay, FaPause, FaStepBackward, FaStepForward } from "react-icons/fa";
 import { useSpotifyPlayer } from "../hooks/useSpotifyPlayer";
-import { TbLoader3 } from "react-icons/tb";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { PlaybackOptions } from "../types/playback";
 
-interface PlaybackOptions {
-  playlistUri?: string;
-  initialTrackIndex?: number;
-  trackUri?: string;        
-  trackPosition?: number;   
-}
 
 interface PlayerSectionProps {
   options?: PlaybackOptions;
@@ -34,22 +28,6 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
     const seconds = Math.floor((ms % 60000) / 1000);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
-
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-    if (isPlaying && playerState?.position !== undefined) {
-      intervalId = setInterval(() => {
-        setLivePosition(prev => prev + 100);
-      }, 100);
-    }
-    return () => clearInterval(intervalId);
-  }, [isPlaying, playerState?.position]);
-
-  useEffect(() => {
-    if (playerState?.position !== undefined) {
-      setLivePosition(playerState.position);
-    }
-  }, [playerState?.position]);
 
   const track = isPlaylistLoading
     ? {
@@ -84,17 +62,33 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
       };
 
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    if (isPlaying && playerState?.position !== undefined) {
+      intervalId = setInterval(() => {
+        setLivePosition(prev => prev + 100);
+      }, 100);
+    }
+    return () => clearInterval(intervalId);
+  }, [isPlaying, playerState?.position]);
+
+  useEffect(() => {
+    if (playerState?.position !== undefined) {
+      setLivePosition(playerState.position);
+    }
+  }, [playerState?.position]);
+
+  useEffect(() => {
     const newTrackId = playerState?.track_window.current_track.id;
     if (newTrackId) onTrackChange(newTrackId);
   }, [playerState, onTrackChange]);
 
   return (
     <section className="flex flex-col flex-1 min-h-0 p-4 border-b-2 border-black h-1/2 md:p-6">
-      <h2 className="w-full mb-2 text-lg font-black tracking-tight text-left text-black uppercase md:text-xl">
+      <h2 className="w-full mb-2 text-lg font-black tracking-tight text-left text-black uppercase font-barrio md:text-xl">
         NOW PLAYING
       </h2>
       <div className="flex flex-col items-center justify-center flex-1 w-full">
-        {/* Album Art (10% larger) */}
+        {/* Album Art */}
         <div
           className="flex items-center justify-center mb-2 border-2 border-black w-28 h-28 md:w-36 md:h-36"
           style={{ background: track.albumColor }}
@@ -139,10 +133,9 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           </button>
         </div>
 
-        {/* Progress Bar - Fixed alignment */}
         <div className="relative w-full h-2 mb-1 overflow-hidden border-2 border-black rounded">
           <div
-            className="absolute top-0 left-0 h-full bg-[#d28ab6] rounded-sm"
+            className="absolute top-0 left-0 h-full rounded-sm bg-accent"
             style={{ width: `${track.progress}%` }}
           ></div>
         </div>

@@ -1,21 +1,14 @@
-import { useEffect } from "react";
-import { useSpotifyTracks } from "../hooks/useSpotifyTracks";
 import PlaylistTrack from "./PlaylistTrack";
-import { TbLoader3 } from "react-icons/tb";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { SpotifyPlaylistTrack } from "../types/track";
 
-export default function PlaylistSection({
-  playlistId,
-  playlistTracks,
-  onTrackClick,
-  currentTrackId,
-}: {
-  playlistId: string;
-  playlistTracks: any[]
+interface PlaylistSectionProps {
+  playlistTracks: SpotifyPlaylistTrack[]
   onTrackClick: (track: any, index: number) => void;
   currentTrackId: string;
-}) {
-  
+}
+
+const PlaylistSection = ({playlistTracks, onTrackClick, currentTrackId}: PlaylistSectionProps) => {
 
   return (
     <section className="flex flex-col flex-1 min-h-0 p-4 h-1/2 md:p-6">
@@ -48,3 +41,7 @@ export default function PlaylistSection({
     </section>
   );
 }
+
+
+
+export default PlaylistSection
