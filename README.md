@@ -12,7 +12,7 @@ The AI Playlist Assistant is a full-stack web application enabling users to auth
 
 ## Installation  
 1. Clone the repository:
-2. cd ai-playlist-assistant
+2. cd into the folder
 3. Install dependencies:  
   `npm install`
 4. Create a `.env.local` file with the following variables:  
