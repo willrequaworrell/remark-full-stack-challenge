@@ -15,7 +15,12 @@ interface ChatSectionProps {
   aiConsolidatedTrackData: ConsolidatedTrack[];
 }
 
-const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData,}: ChatSectionProps) => {
+const ChatSection = ({ 
+  playlistId, 
+  playlistTracks, 
+  currentTrackId, 
+  aiConsolidatedTrackData,
+}: ChatSectionProps) => {
   const { data: session } = useSession();
   const chatConfig = useMemo(
     () => ({
@@ -24,13 +29,23 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
     }),
     [playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData]
   );
+  
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat(chatConfig);
+    
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null); // New ref for input element
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Focus input after message submission
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isLoading]);
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -59,19 +74,14 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
 
       <div className="flex-1 mb-3 space-y-3 overflow-y-auto custom-scrollbar">
         {messages.map((message, idx) => {
-          // Detect if this assistant message is still empty
           const hasText = message.parts.some(
             (p) => p.type === "text" && p.text.trim() !== ""
           );
 
-          // While loading and this is the new assistant stub, show placeholder bubble
           if (isLoading && message.role === "assistant" && !hasText) {
-            return (
-              <ChatMessageLoading key={idx}/>
-            );
+            return <ChatMessageLoading key={idx}/>;
           }
 
-          // Otherwise render the normal message bubble
           return (
             <ChatMessage key={message.id ?? idx} message={message} index={idx} />
           );
@@ -81,6 +91,7 @@ const ChatSection = ({ playlistId, playlistTracks, currentTrackId, aiConsolidate
       </div>
 
       <ChatInput
+        ref={inputRef} 
         value={input}
         disabled={isLoading}
         onChange={handleInputChange}

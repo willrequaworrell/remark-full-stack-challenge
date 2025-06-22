@@ -1,18 +1,26 @@
-import { FormEvent } from "react"
-import { IoSend } from "react-icons/io5"
+import { 
+  FormEvent, 
+  forwardRef, 
+  ForwardedRef,
+  ChangeEvent
+} from "react";
+import { IoSend } from "react-icons/io5";
 
 interface ChatInputProps {
     value: string
     disabled: boolean
-    onChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void
     onSubmit: (e: FormEvent<HTMLFormElement>) => void
-
 }
 
-const ChatInput = ({value, disabled, onChange, onSubmit}: ChatInputProps) => {
+const ChatInput = forwardRef((
+  { value, disabled, onChange, onSubmit }: ChatInputProps,
+  ref: ForwardedRef<HTMLInputElement>
+) => {
   return (
     <form onSubmit={onSubmit} className="flex space-x-2" autoComplete="off">
         <input
+          ref={ref} // Attach ref to input element
           type="text"
           value={value}
           onChange={onChange}
@@ -26,10 +34,11 @@ const ChatInput = ({value, disabled, onChange, onSubmit}: ChatInputProps) => {
           className="flex items-center justify-center w-10 h-10 text-white transition-colors bg-black border-2 border-black rounded-full cursor-pointer hover:text-black hover:bg-white disabled:opacity-70 disabled:bg-gray-100"
         >
           <IoSend className="-rotate-90"/>
-
         </button>
       </form>
   )
-}
+});
 
-export default ChatInput
+ChatInput.displayName = "ChatInput";
+
+export default ChatInput;
