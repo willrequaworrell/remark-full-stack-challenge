@@ -19,7 +19,7 @@ const PlaylistTrack = ({track, index, currentTrackId, onClickPlay}: PlaylistTrac
     return (
         <div
             key={track.id}
-            className={`group flex items-center w-full border-2 border-black rounded-lg px-3 md:px-4 py-2 md:py-3 bg-white text-black hover:bg-gray-100 transition }`}
+            className={`group flex items-center w-full border-2 border-black rounded-lg px-3 md:px-4 py-2 md:py-3 bg-white text-black hover:bg-gray-100 transition`}
         >
             {/* Album Art */}
             <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden bg-gray-100 border-2 border-black rounded md:w-12 md:h-12 md:mr-4">
@@ -41,15 +41,13 @@ const PlaylistTrack = ({track, index, currentTrackId, onClickPlay}: PlaylistTrac
             </div>
 
             {/* Play Button */}
-
             {track.id === currentTrackId ? 
                 <CgLoadbarSound className="text-4xl animate-pulse"/> :
                 
                 <button
                     onClick={() => onClickPlay?.(track, index)}
-                    className="items-center justify-center hidden w-8 h-8 ml-2 text-white transition-all bg-black border-2 border-black rounded-full cursor-pointer group-hover:flex hover:bg-white hover:text-black"
+                    className="flex items-center justify-center w-8 h-8 ml-2 text-white transition-all bg-black border-2 border-black rounded-full cursor-pointer md:hidden md:group-hover:flex hover:bg-white hover:text-black"
                 >
-                    
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M8 5v14l11-7z" />
                     </svg>
