@@ -84,14 +84,14 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
   }, [playerState, onTrackChange]);
 
   return (
-    <section className="flex flex-col flex-1 min-h-0 p-4 border-b-2 border-black h-1/2 md:p-6">
+    <section className="flex flex-col flex-none p-4 border-b-2 border-black md:p-6">
       <h2 className="w-full mb-2 text-lg font-black tracking-tight text-left text-black md:text-xl">
         Now Playing
       </h2>
-      <div className="flex flex-col items-center justify-center flex-1 w-full">
+      <div className="flex flex-col items-center justify-center w-full">
         {/* Album Art */}
         <div
-          className="flex items-center justify-center mb-2 border-2 border-black w-28 h-28 md:w-40 md:h-40"
+          className="flex items-center justify-center mb-2 border-2 border-black w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36"
           style={{ background: track.albumColor }}
         >
           {isPlaylistLoading ? (
