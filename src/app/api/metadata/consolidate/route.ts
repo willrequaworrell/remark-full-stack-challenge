@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         consolidatedTracks.push(consolidated);
         
         // Small delay to respect OpenAI rate limits
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 50));
       } catch (error) {
         console.error(`Failed to consolidate track ${track.id}:`, error);
         consolidatedTracks.push({
