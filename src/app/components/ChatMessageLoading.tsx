@@ -1,13 +1,10 @@
 import React from 'react'
 import { PiDotsThreeOutlineDuotone } from 'react-icons/pi'
 
-interface ChatMessageLoadingProps {
-    key: number
-}
 
-const ChatMessageLoading = ({key}: ChatMessageLoadingProps) => {
+const ChatMessageLoading = () => {
     return (
-        <div key={key} className="flex justify-start">
+        <div className="flex justify-start">
             <div className="border-2 border-black bg-white text-black
                     rounded-tl-lg rounded-tr-lg rounded-br-lg
                     px-4 py-2 max-w-[80%]">
