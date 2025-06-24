@@ -69,7 +69,7 @@ const ChatSection = ({
   return (
     <section className="flex flex-col w-full lg:w-[38.2%] p-4 md:p-6 h-full border-black">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-black md:text-xl">AI Disk Jockey</h2>
+        <h2 className="text-lg font-black md:text-xl">AI Disc Jockey</h2>
       </div>
 
       <div className="flex-1 mb-3 space-y-3 overflow-y-auto custom-scrollbar">

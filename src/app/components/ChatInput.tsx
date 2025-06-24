@@ -18,7 +18,7 @@ const ChatInput = forwardRef((
   ref: ForwardedRef<HTMLInputElement>
 ) => {
   return (
-    <form onSubmit={onSubmit} className="flex space-x-2" autoComplete="off">
+    <form onSubmit={onSubmit} className="flex items-center space-x-2" autoComplete="off">
         <input
           ref={ref} // Attach ref to input element
           type="text"
@@ -26,7 +26,7 @@ const ChatInput = forwardRef((
           onChange={onChange}
           placeholder="Ask about your playlist, or what to play next..."
           disabled={disabled}
-          className="flex-1 px-4 py-2 border-2 border-black rounded-full focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-70 disabled:bg-gray-100"
+          className="flex-1 px-4 py-2 border-2 border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-70 disabled:bg-gray-100"
         />
         <button
           type="submit"

@@ -91,7 +91,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
       <div className="flex flex-col items-center justify-center w-full">
         {/* Album Art */}
         <div
-          className="flex items-center justify-center mb-2 border-2 border-black w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36"
+          className="flex items-center justify-center mb-2 border-2 rounded-md border-black w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36"
           style={{ background: track.albumColor }}
         >
           {isPlaylistLoading ? (
