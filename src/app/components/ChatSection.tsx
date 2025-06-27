@@ -25,10 +25,7 @@ const ChatSection = ({
   const chatConfig = useMemo(
     () => ({
       api: "/api/chat",
-      body: { playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData },
-    }),
-    [playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData]
-  );
+    }),[]);
   
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat(chatConfig);
@@ -49,7 +46,7 @@ const ChatSection = ({
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleSubmit(e, { body: { playlistId, playlistTracks, currentTrackId } });
+    handleSubmit(e, { body: { playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData } });
   };
   
   if (!session) {
