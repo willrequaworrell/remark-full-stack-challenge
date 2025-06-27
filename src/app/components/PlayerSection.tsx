@@ -13,7 +13,7 @@ interface PlayerSectionProps {
 }
 
 export default function PlayerSection({ options, onTrackChange }: PlayerSectionProps) {
-  const { 
+  const {
     playerState,
     isPlaying,
     togglePlayback,
@@ -32,16 +32,16 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
 
   const track = isPlaylistLoading
     ? {
-        albumArt: "",
-        albumColor: "#ffffff",
-        title: "Loading...",
-        artist: "Loading...",
-        currentTime: "00:00",
-        duration: "00:00",
-        progress: 0,
-      }
+      albumArt: "",
+      albumColor: "#ffffff",
+      title: "Loading...",
+      artist: "Loading...",
+      currentTime: "00:00",
+      duration: "00:00",
+      progress: 0,
+    }
     : playerState
-    ? {
+      ? {
         albumArt: playerState.track_window?.current_track?.album?.images[0]?.url || "",
         albumColor: "#ffffff",
         title: playerState.track_window?.current_track?.name || "No Track",
@@ -52,11 +52,11 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           ? Math.round((livePosition / playerState.track_window.current_track.duration_ms) * 100)
           : 0,
       }
-    : {
+      : {
         albumArt: "",
         albumColor: "#ffffff",
-        title: "",
-        artist: "",
+        title: "Loading...",
+        artist: "Loading...",
         currentTime: "00:00",
         duration: "00:00",
         progress: 0,
@@ -95,7 +95,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           style={{ background: track.albumColor }}
         >
           {isPlaylistLoading ? (
-            <LoadingSpinner size={8}/> 
+            <LoadingSpinner size={8} />
           ) : track.albumArt ? (
             <img src={track.albumArt} alt={track.title} className="object-cover w-full h-full" />
           ) : (
@@ -108,7 +108,7 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
           {track.title}
         </h3>
         <p className="mb-1 text-xs font-semibold text-black">{track.artist}</p>
-        
+
         {/* Controls */}
         <div className="flex items-center justify-center mb-2 space-x-2">
           <button
@@ -124,9 +124,9 @@ export default function PlayerSection({ options, onTrackChange }: PlayerSectionP
             className="flex items-center justify-center text-white transition-colors bg-black border-2 border-black rounded-full cursor-pointer w-7 h-7 hover:bg-white hover:text-black disabled:opacity-50"
           >
             {isPlaying ? (
-              <PauseSVG/>
+              <PauseSVG />
             ) : (
-              <PlaySVG/>
+              <PlaySVG />
             )}
           </button>
           <button
