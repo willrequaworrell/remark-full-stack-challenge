@@ -36,6 +36,7 @@ export default async function RootLayout({
           <Suspense fallback={<GlobalLoading />}>
             <RootProvider session={session}>
               {/* {children} */}
+              console.log(children)
               <Footer/>
             </RootProvider>
           </Suspense>

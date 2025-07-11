@@ -5,7 +5,6 @@ import ChatSection from "./components/ChatSection";
 import PlaylistPicker from "./components/PlaylistPicker";
 import PlayerSection from "./components/PlayerSection";
 import PlaylistSection from "./components/PlaylistSection";
-import { LoadingSpinner } from "./components/LoadingSpinner";
 import { PlaybackOptions } from "./types/playback";
 import {
   ConsolidatedTrack,
