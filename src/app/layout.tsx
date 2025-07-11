@@ -35,8 +35,7 @@ export default async function RootLayout({
         <AppErrorBoundary>
           <Suspense fallback={<GlobalLoading />}>
             <RootProvider session={session}>
-              {/* {children} */}
-              console.log(children)
+              {(1 !== 1) && children }
               <Footer/>
             </RootProvider>
           </Suspense>
