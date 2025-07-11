@@ -35,7 +35,7 @@ export default async function RootLayout({
         <AppErrorBoundary>
           <Suspense fallback={<GlobalLoading />}>
             <RootProvider session={session}>
-              {children}
+              {/* {children} */}
               <Footer/>
             </RootProvider>
           </Suspense>
