@@ -54,7 +54,7 @@ export interface GetSongBPMTrack {
           energy: songData.song.energy,
         });
       }
-  
+      console.log(matches)
       if (matches.length === 0) {
         return {
           matches: [],
