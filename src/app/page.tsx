@@ -153,6 +153,7 @@ export default function Page() {
             playlistTracks={playlistTracks}
             currentTrackId={currentTrackId}
             aiConsolidatedTrackData={aiConsolidatedTrackData}
+            onTrackPlay={handleTrackClick}
           />
         ) : (
           <ChatSectionSkeleton/>

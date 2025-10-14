@@ -21,10 +21,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Create concurrency limiter
-    // Adjust the number based on your OpenAI tier:
-    // Tier 1 (free/hobby): 3-5 concurrent
-    // Tier 2: 10-20 concurrent
-    // Tier 3+: higher as needed
     const limit = pLimit(5);
 
     // Process all tracks in parallel with controlled concurrency

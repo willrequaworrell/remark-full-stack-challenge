@@ -13,7 +13,7 @@ export async function searchWebForTrackDetails(
       return { error: 'Search API key or CX missing', suggestion: 'Check configuration' };
     }
   
-    const query = `${songTitle}${artistName ? ` by ${artistName}` : ''} BPM key`;
+    const query = `${songTitle} ${artistName ? `${artistName}` : ''} BPM key`;
     const url   = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&num=5`;
     const res   = await fetch(url);
     console.log(url)

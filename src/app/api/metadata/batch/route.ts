@@ -1,7 +1,7 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { getTrackDetailsFromGetSongBPM } from '@/lib/services/getsongbpm-service';
 import { searchWebForTrackDetails } from '@/lib/services/google-service';
+import pLimit from 'p-limit';
 
 interface TrackMetadata {
   id: string;
@@ -24,84 +24,118 @@ interface BatchRequest {
   currentTrackId: string;
 }
 
-
 async function fetchTrackMetadataWithFallback(
-    trackId: string,
-    songTitle: string,
-    artistName?: string
-  ): Promise<TrackMetadata | null> {
-    const base = {
-      id: trackId,
-      title: songTitle,
-      artist: artistName || 'Unknown Artist',
-      timestamp: Date.now(),
-    };
-  
-    try {
-      const apiResult = await getTrackDetailsFromGetSongBPM(songTitle, artistName);
-      if (apiResult.matches?.length) {
-        const match = apiResult.matches.slice(0, 2); // top 2 matches
-        return {
-          ...base,
-          bpm: match[0].bpm,
-          key: match[0].key,
-          danceability: match[0].danceability,
-          energy: match[0].energy,
-          source: 'getsongbpm',
-        };
-      }
-  
-      const webSearchResults = await searchWebForTrackDetails(songTitle, artistName);
+  trackId: string,
+  songTitle: string,
+  artistName?: string
+): Promise<TrackMetadata> {
+  const base = {
+    id: trackId,
+    title: songTitle,
+    artist: artistName || 'Unknown Artist',
+    timestamp: Date.now(),
+  };
+
+  try {
+    const apiResult = await getTrackDetailsFromGetSongBPM(songTitle, artistName);
+    if (apiResult.matches?.length) {
+      const match = apiResult.matches[0]; // Use first match
       return {
         ...base,
-        webData: webSearchResults,
-        source: 'websearch',
+        bpm: match.bpm,
+        key: match.key,
+        danceability: match.danceability,
+        energy: match.energy,
+        source: 'getsongbpm',
       };
-    } catch {
-      return { ...base, source: 'failed' };
     }
-  }
-  
 
+    // Fallback to web search if no API matches
+    const webSearchResults = await searchWebForTrackDetails(songTitle, artistName);
+    return {
+      ...base,
+      webData: webSearchResults,
+      source: 'websearch',
+    };
+  } catch (error) {
+    console.error(`Failed to fetch metadata for ${songTitle}:`, error);
+    return { 
+      ...base, 
+      source: 'failed' 
+    };
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
     const { playlistId, playlistTracks, currentTrackId }: BatchRequest = await req.json();
+    
     if (!Array.isArray(playlistTracks) || playlistTracks.length === 0) {
       return NextResponse.json({ error: 'Invalid tracks' }, { status: 400 });
     }
 
-    const BATCH_SIZE = 5;
-    const BATCH_DELAY = 2000; // 2s delay to respect rate limits
-    const enrichedTracks: TrackMetadata[] = [];
+    // Create concurrency limiter
+    // Adjust based on GetSongBPM/Google API rate limits:
+    // GetSongBPM free tier: ~3-5 concurrent
+    // Google Custom Search: 100 queries/day free, so pace accordingly
+    const limit = pLimit(3);
 
-    for (let i = 0; i < playlistTracks.length; i += BATCH_SIZE) {
-      const batch = playlistTracks.slice(i, i + BATCH_SIZE);
-      const results = await Promise.all(
-        batch.map(item =>
-          fetchTrackMetadataWithFallback(
-            item.track.id,
-            item.track.name,
-            item.track.artists[0]?.name
-          )
+    // Process all tracks with controlled concurrency
+    const enrichmentPromises = playlistTracks.map(item =>
+      limit(() =>
+        fetchTrackMetadataWithFallback(
+          item.track.id,
+          item.track.name,
+          item.track.artists[0]?.name
         )
-      );
-      enrichedTracks.push(...results.filter(r => r !== null) as TrackMetadata[]);
-      if (i + BATCH_SIZE < playlistTracks.length) {
-        await new Promise(r => setTimeout(r, BATCH_DELAY));
+      )
+    );
+
+    // Wait for all to complete, even if some fail
+    const results = await Promise.allSettled(enrichmentPromises);
+
+    // Extract successful results and count failures
+    const enrichedTracks: TrackMetadata[] = [];
+    let successCount = 0;
+    let failureCount = 0;
+
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        enrichedTracks.push(result.value);
+        if (result.value.source !== 'failed') {
+          successCount++;
+        } else {
+          failureCount++;
+        }
+      } else {
+        // Promise rejected (shouldn't happen with try/catch in fetchTrackMetadataWithFallback)
+        const track = playlistTracks[index].track;
+        console.error(`Promise rejected for track ${track.id}:`, result.reason);
+        enrichedTracks.push({
+          id: track.id,
+          title: track.name,
+          artist: track.artists[0]?.name || 'Unknown Artist',
+          source: 'failed',
+          timestamp: Date.now(),
+        });
+        failureCount++;
       }
-    }
+    });
 
     return NextResponse.json({
       playlistId,
       currentTrackId,
       enrichedTracks,
       totalRequested: playlistTracks.length,
+      successCount,
+      failureCount,
       timestamp: Date.now(),
     });
+
   } catch (err) {
+    console.error('Batch processing error:', err);
     return NextResponse.json(
-      { error: 'Batch processing failed', details: err },
+      { error: 'Batch processing failed', details: err instanceof Error ? err.message : String(err) },
       { status: 500 }
     );
   }

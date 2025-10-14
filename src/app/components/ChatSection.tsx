@@ -1,9 +1,10 @@
+// app/components/ChatSection.tsx
 "use client";
 
 import { useChat } from "@ai-sdk/react";
 import { useSession, signIn } from "next-auth/react";
 import { useRef, useEffect, FormEvent, useMemo } from "react";
-import { ConsolidatedTrack, SpotifyPlaylistTrack } from "../types/track";
+import { ConsolidatedTrack, PlaylistTrackCardType, SpotifyPlaylistTrack } from "../types/track";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import ChatMessageLoading from "./ChatMessageLoading";
@@ -13,6 +14,7 @@ interface ChatSectionProps {
   playlistTracks: SpotifyPlaylistTrack[];
   currentTrackId: string;
   aiConsolidatedTrackData: ConsolidatedTrack[];
+  onTrackPlay: (track: PlaylistTrackCardType, trackIndex: number) => void
 }
 
 const ChatSection = ({ 
@@ -20,24 +22,34 @@ const ChatSection = ({
   playlistTracks, 
   currentTrackId, 
   aiConsolidatedTrackData,
+  onTrackPlay
 }: ChatSectionProps) => {
   const { data: session } = useSession();
+  
   const chatConfig = useMemo(
     () => ({
       api: "/api/chat",
-    }),[]);
+      initialMessages: [
+        {
+          id: "greeting",
+          role: "assistant" as const,
+          content: "Hi there! Ask me anything about the current track, playlist, or what to play next!"
+        }
+      ]
+    }),
+    []
+  );
   
   const { messages, input, handleInputChange, handleSubmit, isLoading } =
     useChat(chatConfig);
     
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null); // New ref for input element
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Focus input after message submission
   useEffect(() => {
     if (!isLoading && inputRef.current) {
       inputRef.current.focus();
@@ -46,7 +58,14 @@ const ChatSection = ({
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleSubmit(e, { body: { playlistId, playlistTracks, currentTrackId, aiConsolidatedTrackData } });
+    handleSubmit(e, { 
+      body: { 
+        playlistId, 
+        playlistTracks, 
+        currentTrackId, 
+        aiConsolidatedTrackData 
+      } 
+    });
   };
   
   if (!session) {
@@ -80,7 +99,14 @@ const ChatSection = ({
           }
 
           return (
-            <ChatMessage key={message.id ?? idx} message={message} index={idx} />
+            <ChatMessage 
+              key={message.id ?? idx} 
+              message={message} 
+              index={idx}
+              onTrackPlay={onTrackPlay}
+              playlistTracks={playlistTracks} 
+              aiConsolidatedTrackData={aiConsolidatedTrackData}
+            />
           );
         })}
 
