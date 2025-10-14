@@ -1,3 +1,4 @@
+// app/api/chat/route.ts
 import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { getPlaylistTracksFromSpotify } from '@/lib/tools/spotify';
@@ -14,17 +15,33 @@ interface ConsolidatedTrack {
   reasoning: string;
 }
 
+interface MessagePart {
+  type: string;
+  toolInvocation?: {
+    toolName: string;
+    state: string;
+    result?: {
+      recommendation?: string;
+    };
+  };
+}
+
+interface ChatMessage {
+  role: string;
+  parts?: MessagePart[];
+}
+
 export async function POST(req: Request) {
   const { messages, playlistId, currentTrackId, aiConsolidatedTrackData } = await req.json();
   
   // Extract previously recommended track IDs from message history
-  const extractRecommendedTracks = (messages: any[]): string[] => {
+  const extractRecommendedTracks = (messages: ChatMessage[]): string[] => {
     const recommended: string[] = [];
     
     messages.forEach(msg => {
       if (msg.role === 'assistant' && msg.parts) {
-        msg.parts.forEach((part: any) => {
-          if (part.type === 'tool-invocation') {
+        msg.parts.forEach((part: MessagePart) => {
+          if (part.type === 'tool-invocation' && part.toolInvocation) {
             const toolInvocation = part.toolInvocation;
             if (toolInvocation.toolName === 'getRecommendations' && 
                 toolInvocation.state === 'result' &&

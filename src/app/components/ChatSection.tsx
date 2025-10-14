@@ -102,7 +102,6 @@ const ChatSection = ({
             <ChatMessage 
               key={message.id ?? idx} 
               message={message} 
-              index={idx}
               onTrackPlay={onTrackPlay}
               playlistTracks={playlistTracks} 
               aiConsolidatedTrackData={aiConsolidatedTrackData}

@@ -1,10 +1,10 @@
+// app/components/ChatMessage.tsx
 import { UIMessage } from "ai";
 import ChatTrackRecommendation from "./ChatTrackRecommendation";
 import { PlaylistTrackCardType } from "../types/track";
 
 interface ChatMessageProps {
   message: UIMessage;
-  index: number;
   onTrackPlay?: (track: PlaylistTrackCardType, trackIndex: number) => void;
   aiConsolidatedTrackData?: Array<{
     trackId: string;
@@ -23,9 +23,29 @@ interface ChatMessageProps {
   }>;
 }
 
+interface EmptyRecommendation {
+  isEmpty: true;
+  reason: string;
+}
+
+interface ValidRecommendation {
+  isEmpty: false;
+  track: {
+    trackId: string;
+    title: string;
+    artist: string;
+    bpm: number | null;
+    camelotKey: string | null;
+    reasoning: string;
+  };
+  trackIndex: number;
+  trackUri: string;
+}
+
+type RecommendationResult = EmptyRecommendation | ValidRecommendation;
+
 const ChatMessage = ({ 
   message, 
-  index, 
   onTrackPlay, 
   aiConsolidatedTrackData,
   playlistTracks 
@@ -50,7 +70,7 @@ const ChatMessage = ({
             return {
               isEmpty: true,
               reason: result?.reason || 'No compatible tracks available'
-            };
+            } as EmptyRecommendation;
           }
           
           if (aiConsolidatedTrackData && playlistTracks) {
@@ -75,14 +95,14 @@ const ChatMessage = ({
                 },
                 trackIndex,
                 trackUri: playlistTrack.uri
-              };
+              } as ValidRecommendation;
             }
           }
         }
       }
       return null;
     })
-    .filter(Boolean);
+    .filter((rec): rec is RecommendationResult => rec !== null);
 
   // Check for loading state
   const isAnalyzing = toolParts.some(part => {
@@ -127,7 +147,7 @@ const ChatMessage = ({
       )}
 
       {/* Recommendation cards or empty state */}
-      {recommendations.map((rec: any, i: number) => (
+      {recommendations.map((rec, i) => (
         <div key={i} className="flex justify-start">
           <div className="max-w-[80%]">
             {rec.isEmpty ? (
